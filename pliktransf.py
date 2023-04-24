@@ -78,6 +78,8 @@ class Transformacje:
         else:
             raise NotImplementedError(f"{output} - format niezdefiniowany")
             
+    
+            
             
     def BLHto2000(self, phi, lam, h):
             '''
@@ -166,3 +168,47 @@ class Transformacje:
             X1992 = xgk * 0.9993 - 5300000
             Y1992 = ygk * 0.9993 + 500000
             return X1992, Y1992
+        
+    def XYZ2neu(self, xa, ya, za, xb, yb, zb, phi, lam, h):
+        '''
+        XYZ -> NEUp -
+        Transformacja z układu współrzędnych XYZ (układu kartezjańskiego) 
+        na układ współrzędnych NEU (układ lokalny związany z punktem odniesienia)
+        służy do dokładnego okreslenia położenia punktu w lokalnym układzie współrzędnych.
+
+
+
+        '''
+        # współrzędne początku  φ λ -> XYZ 
+        N = self.a / np.sqrt(1 - self.ecc2 * np.sin(phi)**2)
+        X0 = (N + h) * np.cos(phi) * np.cos(lam)
+        Y0 = (N + h) * np.cos(phi) * np.sin(lam)
+        Z0 = ((1 - self.ecc2) * N + h) * np.sin(phi)
+    
+        # obliczenie współrzędnych XYZ
+        dxyz = np.array([Xb,Yb,Zb]) - np.array([Xa,Ya,Za])
+        X, Y, Z = dxyz - np.array([X0, Y0, Z0])
+    
+        # Macierz obrotu
+        sin_phi = np.sin(phi)
+        cos_phi = np.cos(phi)
+        sin_lam = np.sin(lam)
+        cos_lam = np.cos(lam)
+    
+        R = np.array([[-sin_lam,           cos_lam,           0],
+                      [-sin_phi*cos_lam, -sin_phi*sin_lam,  cos_phi],
+                      [ cos_phi*cos_lam,  cos_phi*sin_lam,  sin_phi]])
+    
+        # Obliczenie współrzędnych NEU
+        NEU = np.dot(R, np.array([X, Y, Z]))
+    
+     
+        N = NEU[0]
+        E = NEU[1]
+        U = -NEU[2]
+    
+    
+        phi_stopnie = np.degrees(phi)
+        lam_stopnie = np.degrees(lam)
+    
+        return (N, E, U, phi_stopnie, lam_stopnie)
