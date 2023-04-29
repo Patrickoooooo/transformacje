@@ -2,12 +2,12 @@ INSTRUKCJA OBSŁUGI
 
 1. DO CZEGO SŁUŻY PROGRAM?
 Program służy do przeliczania współrzędnych. Obsługuje on następujące transformacje:
--przeliczenie współrzędnych geocentrycznych XYZ na współrzędne geodezyjne BLH
--przeliczenie współrzędnych geodezyjnych BLHdo współrzędnych prostokątnych w układzie 2000
--przeliczenie współrzędnych geodezyjnych BLH do współrzędnych prostokątnych w układzie 1992
--przeliczenie współrzędnych geodezyjnych BLH do współrzędnych geocentrycznych XYZ
--przeliczenie współrzędnych geocentrycznych XYZ do współrzędnych topocentrcznych NEU
--przeliczenie współrzędnych geodezyjnych BLH do współrzędnych geocentrycznych XYZ
+przeliczenie współrzędnych geocentrycznych XYZ na współrzędne geodezyjne BLH, 
+przeliczenie współrzędnych geodezyjnych BLHdo współrzędnych prostokątnych w układzie 2000, 
+przeliczenie współrzędnych geodezyjnych BLH do współrzędnych prostokątnych w układzie 1992, 
+przeliczenie współrzędnych geodezyjnych BLH do współrzędnych geocentrycznych XYZ, 
+przeliczenie współrzędnych geocentrycznych XYZ do współrzędnych topocentrcznych NEU, 
+przeliczenie współrzędnych geodezyjnych BLH do współrzędnych geocentrycznych XYZ, 
 
 Program obsługuje parametry modeli elipsoid: GRS80, WGS84, Krassowskiego
 
@@ -37,6 +37,6 @@ Przykładowo:  1000.000, 1200.000, 1300.000, 1001.000, 1202.000, 1303.000
 
 Aby skorzystać z programu i danych zapisanych na pliku wyjściowych, wywołujemy go przez wiersz poleceń. Program korzysta z biblioteki argparse, 
 zatem przy wowołaniu podajemy argumenty. Argument "-m" oznacza model elipsoidy, na której dokonujemy przeliczeń współrzędnych, przy czym program obsługuje trzy, które użytkownik ma do wyboru: "wgs84","grs80", "krassowski".
-"-t" oznacza transformację, z jakiej użytkownik chce skorzystać, przy czym ma do wyboru: "Hirvonen", "BLHto2000", "BLHto1992".
+"-t" oznacza transformację, z jakiej użytkownik chce skorzystać, przy czym ma do wyboru: "Hirvonen", "BLHtoXYZ", "BLHto2000", "BLHto1992".
 Argument ,,-from_file" oznacza plik z którego program pobiera dane wejściowe dla danej transformacji, a argument "-to_file" plik do którego zostaną zapisane dane wyjściowe. Przy owych polach jako argument użytkownik musi podać ścieżkę/nazwę pliku.
 
