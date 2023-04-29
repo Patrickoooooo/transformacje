@@ -244,8 +244,8 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Transformacje współrzędnych')
     parser.add_argument('-m', type=str, help='Model elipsoidy', choices=['wgs84', 'grs80', 'krassowski'] )
     parser.add_argument('-t', type=str, help='Rodzaj transformacji', choices=['Hirvonen','BLH21992', 'BLHto2000', 'dXYZtoNEU'])
-    parser.add_argument('-from_file', type=str, help='Ścieżka do pliku/nazwa pliku z którego pobieramy dane')
-    parser.add_argument('-to_file', type=str, help='Ścieżka do pliku/nazwa pliku do którego zapisujemy dane')
+    parser.add_argument('-from_file', type=str, help='Ścieżka do pliku/nazwa pliku z którego program pobiera dane')
+    parser.add_argument('-to_file', type=str, help='Ścieżka do pliku/nazwa pliku do którego program zapisuje dane')
     
     args = parser.parse_args()
     
