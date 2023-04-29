@@ -19,9 +19,9 @@ class Transformacje:
         elif model == "grs80":
             self.a = 6378137.0
             self.b = 6356752.31414036
-        elif model == "mars":
-            self.a = 3396900.0
-            self.b = 3376097.80585952
+        elif model == "krassowski":
+            self.a = 6378245.00000
+            self.b = 6356863.01877
         else:
             raise NotImplementedError(f"{model} niezaimplementowany model")
         self.flat = (self.a - self.b) / self.a
@@ -30,7 +30,7 @@ class Transformacje:
         
         
         
-    def Hirvonen(self, X, Y, Z, output = 'dec_degree'):
+    def Hirvonen(self, X, Y, Z):
         """
         Algorytm Hirvonena - algorytm transformacji współrzędnych ortokartezjańskich (x, y, z)
         na współrzędne geodezyjne długość szerokość i wysokośc elipsoidalna (phi, lam, h). Jest to proces iteracyjny. 
@@ -53,7 +53,7 @@ class Transformacje:
             dms - degree, minutes, sec
         """
         p   = np.sqrt(X**2 + Y**2)           # promień
-        phi_poprzednie= np.arctan(Z / (p * (1 - self.ecc2)))    # pierwsze przybliilizenie
+        phi_poprzednie= np.arctan(Z / (p * (1 - self.ecc2)))    
         phi = 0
         while abs(phi_poprzednie - phi) > 0.000001/206265:    
             phi_poprzednie = phi
@@ -63,32 +63,30 @@ class Transformacje:
         lam = np.arctan(Y/X)
         N = self.a / np.sqrt(1 - self.ecc2 * (np.sin(phi))**2);
         h = p / np.cos(phi) - N       
-        if output == "dec_degree":
-            def deg2dms(dd):
-                deg=np.trunc(dd)
-                mnt=np.trunc((dd-deg)*60) 
-                sec=(((dd-deg)*60)-mnt)*60
-                print(f'{deg:.0f} {abs(mnt):.0f} {abs(sec):.5f}')
-            return np.rad2deg(phi), np.rad2deg(lam), h 
-    
-        elif output == "dms":
-            phi = self.deg2dms(np.rad2deg(phi))
-            lam = self.deg2dms(np.rad2deg(lam))
-            return f"{phi[0]:02d}:{phi[1]:02d}:{phi[2]:.2f}", f"{lam[0]:02d}:{lam[1]:02d}:{lam[2]:.2f}", f"{h:.3f}"
-        else:
-            raise NotImplementedError(f"{output} - format niezdefiniowany")
-            
-    
-            
+        
+        return np.rad2deg(phi), np.rad2deg(lam), h 
+         
             
     def BLHto2000(self, phi, lam, h):
             '''
             
-            Transformacja współrzędnych geodezyjnych φ i λ n
-            a brytyjski układ współrzędnych geodezyjnych UK2000 
+            Transformacja współrzędnych geodezyjnych φ, λ, h
+            na układ współrzędnych prostokątnych płaskich w układzie 2000 
             to przekształcenie z jednego układu odniesienia na drugi. 
-            Wartości φ i λ wyrażają położenie punktu na powierzchni elipsoidy referencyjnej, a układ UK2000 jest planimetrycznym układem współrzędnych geodezyjnych, który stosuje się do map, a jego wartości współrzędnych wyrażone są w metrach.
+            Wartości φ i λ wyrażają położenie punktu na powierzchni elipsoidy referencyjnej, a układ 2000 jest planimetrycznym układem współrzędnych prostokątnych płaskich,
+            który stosuje się do map, a jego wartości współrzędnych wyrażone są w metrach.
+            Parameters
+            ----------
+            phi, lam, h : FLOAT
+                 współrzędne geodezyjne, 
 
+            Returns
+            -------
+            X2000
+                [metry] - współrzędna prostokątna płaska X
+            Y2000
+                [metry] - współrzędna prostokątna płaska Y 
+           
             '''
             
             if lam>13.5 and lam <16.5:
@@ -137,6 +135,24 @@ class Transformacje:
         
         
     def BLHto1992(self, phi, lam, h):
+            '''
+        
+            Transformacja współrzędnych geodezyjnych φ, λ, h
+            na układ współrzędnych prostokątnych w układzie 1992 
+            Wartości φ i λ wyrażają położenie punktu na powierzchni elipsoidy referencyjnej, a układ 1992 jest planimetrycznym układem współrzędnych prostokątnych płaskich,
+            który stosuje się do map, a jego wartości współrzędnych wyrażone są w metrach.
+            PARAMETERS:
+            -------
+            phi, lam, h : FLOAT
+                 współrzędne geodezyjne, 
+
+            Returns
+            -------
+            X2000
+                [metry] - współrzędna prostokątna płaska X
+            Y2000
+                [metry] - współrzędna prostokątna płaska Y 
+            '''
             phi=np.deg2rad(phi)
             lam=np.deg2rad(lam)
             #południk osiowy dla Polski równy:
@@ -169,110 +185,395 @@ class Transformacje:
             Y1992 = ygk * 0.9993 + 500000
             return X1992, Y1992
         
-    def XYZ2neu(self, xa, ya, za, xb, yb, zb, phi, lam, h):
-        '''
-        XYZ -> NEUp -
-        Transformacja z układu współrzędnych XYZ (układu kartezjańskiego) 
-        na układ współrzędnych NEU (układ lokalny związany z punktem odniesienia)
-        służy do dokładnego okreslenia położenia punktu w lokalnym układzie współrzędnych.
+    #def dXYZ2NEU(self, xp, yp, zp, xk, yk, zk):
+        #'''
+        #XYZ -> NEUp -
+        #Transformacja z układu współrzędnych geocentrcznych XYZ 
+        #na układ współrzędnych topograficznych NEU (układ lokalny związany z punktem odniesienia), 
+        #służy do dokładnego okreslenia położenia punktu w lokalnym układzie współrzędnych.
+        #PARAMETERS
+        #-------
+        #xp, yp, zp : FLOAT
+        #     współrzędne geocentryczne punktu początkowego
+        #xk, yk, zk : FLOAT
+        #     współrzędne geocentryczne punktu końcowego     
+
+        #Returns
+        #-------
+        #X2000
+        #    [metry] - współrzędna prostokątna płaska X
+        #Y2000
+        #    [metry] - współrzędna prostokątna płaska Y 
 
 
-
-        '''
-        # współrzędne początku  φ λ -> XYZ 
-        N = self.a / np.sqrt(1 - self.ecc2 * np.sin(phi)**2)
-        X0 = (N + h) * np.cos(phi) * np.cos(lam)
-        Y0 = (N + h) * np.cos(phi) * np.sin(lam)
-        Z0 = ((1 - self.ecc2) * N + h) * np.sin(phi)
-    
-        # obliczenie współrzędnych XYZ
-        dxyz = np.array([Xb,Yb,Zb]) - np.array([Xa,Ya,Za])
-        X, Y, Z = dxyz - np.array([X0, Y0, Z0])
+        #'''
+        #współrzędne początku  φ λ -> XYZ 
+        #N = self.a / np.sqrt(1 - self.ecc2 * np.sin(phi)**2)
+        
+        #obliczenie współrzędnych XYZ
+        #dxyz = np.array([xk,yk,zk]) - np.array([xp,yp,zp])
+        #X, Y, Z = dxyz - np.array([X0, Y0, Z0])
     
         # Macierz obrotu
-        sin_phi = np.sin(phi)
-        cos_phi = np.cos(phi)
-        sin_lam = np.sin(lam)
-        cos_lam = np.cos(lam)
+        #sin_phi = np.sin(phi)
+        #cos_phi = np.cos(phi)
+        #sin_lam = np.sin(lam)
+        #cos_lam = np.cos(lam)
     
-        R = np.array([[-sin_lam,           cos_lam,           0],
-                      [-sin_phi*cos_lam, -sin_phi*sin_lam,  cos_phi],
-                      [ cos_phi*cos_lam,  cos_phi*sin_lam,  sin_phi]])
+        #R = np.array([[-sin_lam,           cos_lam,           0],
+                      #[-sin_phi*cos_lam, -sin_phi*sin_lam,  cos_phi],
+                      #[ cos_phi*cos_lam,  cos_phi*sin_lam,  sin_phi]])
     
         # Obliczenie współrzędnych NEU
-        NEU = np.dot(R, np.array([X, Y, Z]))
+        #NEU = np.dot(R, np.array([X, Y, Z]))
     
      
-        N = NEU[0]
-        E = NEU[1]
-        U = -NEU[2]
+        #N = NEU[0]
+        #E = NEU[1]
+        #U = -NEU[2]
     
     
-        phi_stopnie = np.degrees(phi)
-        lam_stopnie = np.degrees(lam)
+        #phi_stopnie = np.degrees(phi)
+        #lam_stopnie = np.degrees(lam)
     
-        return (N, E, U, phi_stopnie, lam_stopnie)
+        #return (N, E, U, phi_stopnie, lam_stopnie)
 
 if __name__=='__main__':
     
     import argparse
-    parser = argparse.ArgumentParser(description='Transformacje wspolrzednych')
-    parser.add_argument('x', type=float, help='Współrzędna x')
-    parser.add_argument('y', type=float, help='Współrzędna y')
-    parser.add_argument('z', type=float, help='Współrzędna z')
+    parser = argparse.ArgumentParser(description='Transformacje współrzędnych')
+    parser.add_argument('-m', type=str, help='Model elipsoidy', choices=['wgs84', 'grs80', 'krassowski'] )
+    parser.add_argument('-t', type=str, help='Rodzaj transformacji', choices=['Hirvonen','BLH21992', 'BLHto2000', 'dXYZtoNEU'])
+    parser.add_argument('-from_file', help='Ścieżka do pliku/nazwa pliku z którego pobieramy dane')
+    parser.add_argument('-to_file', help='Ścieżka do pliku/nazwa pliku do którego zapisujemy dane')
+    
     args = parser.parse_args()
     
-    phi,lam,h = 
+    print(args.m, args.t, args.from_file, args.to_file)
     
-    
-    with open('plikprzykladowedane.py', 'r') as f:
-        lines = f.readlines()
+    if args.m == 'grs80':
+        if args.t == 'Hirvonen':
+            with open(args.from_file, 'r'):
+                lines = args.from_file.readlines()
+                wynik_transformacji = open(args.to_file, 'w')
+                
+                X=[]
+                Y=[]
+                Z=[]
+                for line in lines:
+                    if "geocentryczne" in line:
+                        continue
+                    else:
+                        rozdzielone_wsp=line.split(',')
+                        X.append(rozdzielone_wsp[0])
+                        Y.append(rozdzielone_wsp[1])
+                        Z.append(rozdzielone_wsp[2])
+        
+                for (x,y,z) in zip(X,Y,Z):
+                    #utworzy obiekt o tych współrzędnych
+                    geocentryczne_grs80=Transformacje(model = "grs80")
+                    phi,lam,h = geocentryczne_grs80.Hirvonen(float(x), float(y), float(z))
+                    wynik_transformacji.write(phi,lam,h)
+                    
+                args.from_file.close()
+                wynik_transformacji.close()
+                
+        elif args.t =='BLHto2000':
+            with open(args.from_file, 'r'):
+                lines = args.from_file.readlines()
+                wynik_transformacji = open(args.to_file, 'w')
+                
+                B=[]
+                L=[]
+                H=[]
+                for line in lines:
+                    if "geodezyjne" in line:
+                        continue
+                    else:
+                        rozdzielone_wsp = line.split(',')
+                        Bd = rozdzielone_wsp[0]
+                        Bm = rozdzielone_wsp[1]
+                        Bs = rozdzielone_wsp[2]
+                        
+                        Bdeg=Bd+Bm/60+Bs/3600
+                        B.append(Bdeg)
+                        
+                        Ld = rozdzielone_wsp[3]
+                        Lm = rozdzielone_wsp[4]
+                        Ls = rozdzielone_wsp[5]
 
-        X = []
-        Y = []
-        Z = []
-        
-        PHI=[]
-        LAM=[]
-        H=[]
-        
-        N=[]
-        E=[]
-        U=[]
-        
-        X2000=[]
-        Y2000=[]
+                        Ldeg=Ld+Lm/60+Ls/3600
+                        L.append(Ldeg)
+                        
+                        wys = rozdzielone_wsp[6]
+                        H.append(wys)
+                        
+                for (b,l,h) in zip(B,L,H):
+                    #utworzy obiekt o tych współrzędnych
+                    geodezyjne2000_grs80=Transformacje(model = "grs80")
+                    X2000, Y2000 = geodezyjne2000_grs80.BLHto2000(float(b), float(l), float(h))
+                    print(f'Wynik transformacji BLH do układu 2000: X2000{X2000:.3f}, Y2000{Y2000:.3f}')
+                    wynik_transformacji.write(X2000, Y2000)
+                    
+                args.from_file.close()
+                wynik_transformacji.close()
+                
+        elif args.t =='BLHto1992':
+            with open(args.from_file, 'r'):
+                lines = args.from_file.readlines()
+                wynik_transformacji = open(args.to_file, 'w')
+                
+                B=[]
+                L=[]
+                H=[]
+                for line in lines:
+                    if "geodezyjne" in line:
+                        continue
+                    else:
+                        rozdzielone_wsp = line.split(',')
+                        Bd = rozdzielone_wsp[0]
+                        Bm = rozdzielone_wsp[1]
+                        Bs = rozdzielone_wsp[2]
+                        
+                        Bdeg=Bd+Bm/60+Bs/3600
+                        B.append(Bdeg)
+                        
+                        Ld = rozdzielone_wsp[3]
+                        Lm = rozdzielone_wsp[4]
+                        Ls = rozdzielone_wsp[5]
 
+                        Ldeg=Ld+Lm/60+Ls/3600
+                        L.append(Ldeg)
+                        
+                        wys = rozdzielone_wsp[6]
+                        H.append(wys)
+                        
+                for (b,l,h) in zip(B,L,H):
+                    #utworzy obiekt o tych współrzędnych
+                    geodezyjne1992_grs80=Transformacje(model = "grs80")
+                    X1992, Y1992 = geodezyjne1992_grs80.BLHto1992(float(b), float(l), float(h))
+                    print(f'Wynik transformacji BLH do układu 1992: X1992{X1992:.3f}, Y1992{Y1992:.3f}')
+                    wynik_transformacji.write(X1992, Y1992)
+                    
+                args.from_file.close()
+                wynik_transformacji.close()
+                
+                
+    elif args.m == 'wgs84':
+        if args.t == 'Hirvonen':
+            with open(args.from_file, 'r'):
+                lines = args.from_file.readlines()
+                wynik_transformacji = open(args.to_file, 'w')
+                
+                X=[]
+                Y=[]
+                Z=[]
+                for line in lines:
+                    if "geocentryczne" in line:
+                        continue
+                    else:
+                        rozdzielone_wsp=line.split(',')
+                        X.append(rozdzielone_wsp[0])
+                        Y.append(rozdzielone_wsp[1])
+                        Z.append(rozdzielone_wsp[2])
         
-        X1992=[]
-        Y1992=[]
+                for (x,y,z) in zip(X,Y,Z):
+                    #utworzy obiekt o tych współrzędnych
+                    geocentryczne_wgs84=Transformacje(model = "wgs84")
+                    phi,lam,h = geocentryczne_wgs84.Hirvonen(float(x), float(y), float(z))
+                    wynik_transformacji.write(phi,lam,h)
+                    
+                args.from_file.close()
+                wynik_transformacji.close()
+                
+        elif args.t =='BLHto2000':
+            with open(args.from_file, 'r'):
+                lines = args.from_file.readlines()
+                wynik_transformacji = open(args.to_file, 'w')
+                
+                B=[]
+                L=[]
+                H=[]
+                for line in lines:
+                    if "geodezyjne" in line:
+                        continue
+                    else:
+                        rozdzielone_wsp = line.split(',')
+                        Bd = rozdzielone_wsp[0]
+                        Bm = rozdzielone_wsp[1]
+                        Bs = rozdzielone_wsp[2]
+                        
+                        Bdeg=Bd+Bm/60+Bs/3600
+                        B.append(Bdeg)
+                        
+                        Ld = rozdzielone_wsp[3]
+                        Lm = rozdzielone_wsp[4]
+                        Ls = rozdzielone_wsp[5]
+
+                        Ldeg=Ld+Lm/60+Ls/3600
+                        L.append(Ldeg)
+                        
+                        wys = rozdzielone_wsp[6]
+                        H.append(wys)
+                        
+                for (b,l,h) in zip(B,L,H):
+                    #utworzy obiekt o tych współrzędnych
+                    geodezyjne2000_wgs84=Transformacje(model = "wgs84")
+                    X2000, Y2000 = geodezyjne2000_wgs84.BLHto2000(float(b), float(l), float(h))
+                    print(f'Wynik transformacji BLH do układu 2000: X2000{X2000:.3f}, Y2000{Y2000:.3f}')
+                    wynik_transformacji.write(X2000, Y2000)
+                    
+                args.from_file.close()
+                wynik_transformacji.close()
+                
+        elif args.t =='BLHto1992':
+            with open(args.from_file, 'r'):
+                lines = args.from_file.readlines()
+                wynik_transformacji = open(args.to_file, 'w')
+                
+                B=[]
+                L=[]
+                H=[]
+                for line in lines:
+                    if "geodezyjne" in line:
+                        continue
+                    else:
+                        rozdzielone_wsp = line.split(',')
+                        Bd = rozdzielone_wsp[0]
+                        Bm = rozdzielone_wsp[1]
+                        Bs = rozdzielone_wsp[2]
+                        
+                        Bdeg=Bd+Bm/60+Bs/3600
+                        B.append(Bdeg)
+                        
+                        Ld = rozdzielone_wsp[3]
+                        Lm = rozdzielone_wsp[4]
+                        Ls = rozdzielone_wsp[5]
+
+                        Ldeg=Ld+Lm/60+Ls/3600
+                        L.append(Ldeg)
+                        
+                        wys = rozdzielone_wsp[6]
+                        H.append(wys)
+                        
+                for (b,l,h) in zip(B,L,H):
+                    #utworzy obiekt o tych współrzędnych
+                    geodezyjne1992_wgs84=Transformacje(model = "wgs84")
+                    X1992, Y1992 = geodezyjne1992_wgs84.BLHto1992(float(b), float(l), float(h))
+                    print(f'Wynik transformacji BLH do układu 1992: X1992{X1992:.3f}, Y1992{Y1992:.3f}')
+                    wynik_transformacji.write(X1992, Y1992)
+                    
+                args.from_file.close()
+                wynik_transformacji.close()
+                
+                
+    elif args.m == 'krassowski':
+        if args.t == 'Hirvonen':
+            with open(args.from_file, 'r'):
+                lines = args.from_file.readlines()
+                wynik_transformacji = open(args.to_file, 'w')
+                
+                X=[]
+                Y=[]
+                Z=[]
+                for line in lines:
+                    if "geocentryczne" in line:
+                        continue
+                    else:
+                        rozdzielone_wsp=line.split(',')
+                        X.append(rozdzielone_wsp[0])
+                        Y.append(rozdzielone_wsp[1])
+                        Z.append(rozdzielone_wsp[2])
         
-        
-        for line in lines:
-            if "print" in line:
-                continue
-            else:
-                rozdzielone_wsp=line.split(',')
-                X.append(rozdzielone_wsp[0])
-                Y.append(rozdzielone_wsp[1])
-                Z.append(rozdzielone_wsp[2])
-        
-        for (x,y,z) in zip(X,Y,Z):
-        #utworzy obiekt o tych współrzędnych
-            geocentryczne=Transformacje(model = "grs80")
-            phi,lam,h = geocentryczne.Hirvonen(float(x), float(y), float(z))
+                for (x,y,z) in zip(X,Y,Z):
+                    #utworzy obiekt o tych współrzędnych
+                    geocentryczne_krassowski=Transformacje(model = "krassowski")
+                    phi,lam,h = geocentryczne_krassowski.Hirvonen(float(x), float(y), float(z))
+                    wynik_transformacji.write(phi,lam,h)
+                    
+                args.from_file.close()
+                wynik_transformacji.close()
+                
+        elif args.t =='BLHto2000':
+            with open(args.from_file, 'r'):
+                lines = args.from_file.readlines()
+                wynik_transformacji = open(args.to_file, 'w')
+                
+                B=[]
+                L=[]
+                H=[]
+                for line in lines:
+                    if "geodezyjne" in line:
+                        continue
+                    else:
+                        rozdzielone_wsp = line.split(',')
+                        Bd = rozdzielone_wsp[0]
+                        Bm = rozdzielone_wsp[1]
+                        Bs = rozdzielone_wsp[2]
+                        
+                        Bdeg=Bd+Bm/60+Bs/3600
+                        B.append(Bdeg)
+                        
+                        Ld = rozdzielone_wsp[3]
+                        Lm = rozdzielone_wsp[4]
+                        Ls = rozdzielone_wsp[5]
+
+                        Ldeg=Ld+Lm/60+Ls/3600
+                        L.append(Ldeg)
+                        
+                        wys = rozdzielone_wsp[6]
+                        H.append(wys)
+                        
+                for (b,l,h) in zip(B,L,H):
+                    #utworzy obiekt o tych współrzędnych
+                    geodezyjne2000_krassowski=Transformacje(model = "krassowski")
+                    X2000, Y2000 = geodezyjne2000_krassowski.BLHto2000(float(b), float(l), float(h))
+                    print(f'Wynik transformacji BLH do układu 2000: X2000{X2000:.3f}, Y2000{Y2000:.3f}')
+                    wynik_transformacji.write(X2000, Y2000)
+                    
+                args.from_file.close()
+                wynik_transformacji.close()
+                
+        elif args.t =='BLHto1992':
+            with open(args.from_file, 'r'):
+                lines = args.from_file.readlines()
+                wynik_transformacji = open(args.to_file, 'w')
+                
+                B=[]
+                L=[]
+                H=[]
+                for line in lines:
+                    if "geodezyjne" in line:
+                        continue
+                    else:
+                        rozdzielone_wsp = line.split(',')
+                        Bd = rozdzielone_wsp[0]
+                        Bm = rozdzielone_wsp[1]
+                        Bs = rozdzielone_wsp[2]
+                        
+                        Bdeg=Bd+Bm/60+Bs/3600
+                        B.append(Bdeg)
+                        
+                        Ld = rozdzielone_wsp[3]
+                        Lm = rozdzielone_wsp[4]
+                        Ls = rozdzielone_wsp[5]
+
+                        Ldeg=Ld+Lm/60+Ls/3600
+                        L.append(Ldeg)
+                        
+                        wys = rozdzielone_wsp[6]
+                        H.append(wys)
+                        
+                for (b,l,h) in zip(B,L,H):
+                    #utworzy obiekt o tych współrzędnych
+                    geodezyjne1992_krassowski=Transformacje(model = "krasowski")
+                    X1992, Y1992 = geodezyjne1992_krassowski.BLHto1992(float(b), float(l), float(h))
+                    print(f'Wynik transformacji BLH do układu 1992: X1992{X1992:.3f}, Y1992{Y1992:.3f}')
+                    wynik_transformacji.write(X1992, Y1992)
+                    
+                args.from_file.close()
+                wynik_transformacji.close()
+                
+                
             
-            print('Wynikiem transformacji Hirvonena dla podanych X,Y,Z są współrzędne: ')
-            print(f'B={phi} stopnie, L={lam}stopnie, H={h}m ')
-            
-            geodezyjne=Transformacje(model = "wgs84")
-            X2000,Y2000=geodezyjne.BLHto2000(phi, lam, h)
-            print('Wynikiem transformacji BLH do układu 2000 dla podanych phi, lam, h są współrzędne: ')
-            print(f'X2000={X2000:.3f}m , Y2000={Y2000:.3f}m ')
-            
-            geodezyjne = Transformacje(model = "wgs84")
-            X1992,Y1992 = geodezyjne.BLHto1992(phi, lam, h)
-            print('Wynikiem transformacji BLH do układu 1992 dla podanych phi, lam, h są współrzędne: ')
-            print(f'X1992={X1992:.3f}m , Y1992={Y2000:.3f}m ')
-            print("=================")
-            print("=================")
+                
