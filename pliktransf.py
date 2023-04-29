@@ -32,6 +32,7 @@ class Transformacje:
         
     def Hirvonen(self, X, Y, Z):
         """
+        
         Algorytm Hirvonena - algorytm transformacji współrzędnych ortokartezjańskich (x, y, z)
         na współrzędne geodezyjne długość szerokość i wysokośc elipsoidalna (phi, lam, h). Jest to proces iteracyjny. 
         W wyniku 3-4-krotneej iteracji wyznaczenia wsp. phi można przeliczyć współrzędne z dokładnoscią ok 1 cm.     
@@ -48,10 +49,9 @@ class Transformacje:
             [stopnie dziesiętne] - długośc geodezyjna.
         h : TYPE
             [metry] - wysokość elipsoidalna
-        output [STR] - optional, defoulf 
-            dec_degree - decimal degree
-            dms - degree, minutes, sec
+            
         """
+        
         p   = np.sqrt(X**2 + Y**2)           # promień
         phi_poprzednie= np.arctan(Z / (p * (1 - self.ecc2)))    
         phi = 0
@@ -66,6 +66,42 @@ class Transformacje:
         
         return np.rad2deg(phi), np.rad2deg(lam), h 
          
+    
+    
+    def BLHtoXYZ(self, phi, lam, h):
+        '''
+        
+        Transformacja współrzędnych geodezyjnych φ, λ, h
+        na współrzędne geocentryczne XYZ.
+        Wartości φ, λ, h wyrażają położenie punktu na powierzchni elipsoidy referencyjnej podane w stopniach dziesiętnych,
+        a X, Y, Z wartości współrzędnych geocentryczych wyrażone są w metrach.
+        Parameters
+        ----------
+        phi, lam, h : FLOAT
+             współrzędne geodezyjne: szerokoć geodezyjna, długoć geodezyjna, wysokosc nad elipsoidą 
+
+        Returns
+        -------
+        X
+            [metry] - współrzędna geocentryczna w kierunku osi X
+        Y
+            [metry] - współrzędna geocentryczna w kierunku osi Y 
+        Z
+            [metry] - współrzędna geocentryczna w kierunku osi Z
+        '''
+        phi=np.deg2rad(phi)
+        lam=np.deg2rad(lam)
+        
+        def Np(phi,a,e2):
+            N=self.a/np.sqrt(1-self.ecc2 * np.sin(phi)**2)
+            return N
+        N=Np(phi,self.a, self.ecc2)
+        
+        X = (N + h)*(np.cos(phi))*(np.cos(lam))
+        Y = (N + h)*(np.cos(phi))*(np.sin(lam))
+        Z = (N*(1-self.ecc2)+h)*(np.sin(phi))
+        return X,Y,Z
+    
             
     def BLHto2000(self, phi, lam, h):
             '''
@@ -78,7 +114,7 @@ class Transformacje:
             Parameters
             ----------
             phi, lam, h : FLOAT
-                 współrzędne geodezyjne, 
+                 współrzędne geodezyjne: szerokoć geodezyjna, długoć geodezyjna, wysokosc nad elipsoidą
 
             Returns
             -------
@@ -144,7 +180,7 @@ class Transformacje:
             PARAMETERS:
             -------
             phi, lam, h : FLOAT
-                 współrzędne geodezyjne, 
+                 współrzędne geodezyjne: szerokoć geodezyjna, długoć geodezyjna, wysokosc nad elipsoidą
 
             Returns
             -------
@@ -153,6 +189,7 @@ class Transformacje:
             Y2000
                 [metry] - współrzędna prostokątna płaska Y 
             '''
+            
             phi=np.deg2rad(phi)
             lam=np.deg2rad(lam)
             #południk osiowy dla Polski równy:
@@ -184,6 +221,7 @@ class Transformacje:
             X1992 = xgk * 0.9993 - 5300000
             Y1992 = ygk * 0.9993 + 500000
             return X1992, Y1992
+        
         
     #def dXYZ2NEU(self, xp, yp, zp, xk, yk, zk):
         #'''
@@ -243,333 +281,430 @@ if __name__=='__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Transformacje współrzędnych')
     parser.add_argument('-m', type=str, help='Model elipsoidy', choices=['wgs84', 'grs80', 'krassowski'] )
-    parser.add_argument('-t', type=str, help='Rodzaj transformacji', choices=['Hirvonen','BLH21992', 'BLHto2000', 'dXYZtoNEU'])
-    parser.add_argument('-from_file', type=str, help='Ścieżka do pliku/nazwa pliku z którego program pobiera dane')
-    parser.add_argument('-to_file', type=str, help='Ścieżka do pliku/nazwa pliku do którego program zapisuje dane')
+    parser.add_argument('-t', type=str, help='Rodzaj transformacji', choices=['Hirvonen','BLHtoXYZ', 'BLH21992', 'BLHto2000', 'dXYZtoNEU'])
+    parser.add_argument('-from_file', type=argparse.FileType('r'), help='Ścieżka do pliku/nazwa pliku z którego program pobiera dane')
+    parser.add_argument('-to_file', type=argparse.FileType('w'), help='Ścieżka do pliku/nazwa pliku do którego program zapisuje dane')
     
     args = parser.parse_args()
     
     print(args.m, args.t, args.from_file, args.to_file)
     
+    
+    
     if args.m == 'grs80':
         if args.t == 'Hirvonen':
-            with open(args.from_file, 'r'):
+            
                 lines = args.from_file.readlines()
-                wynik_transformacji = open(args.to_file, 'w')
+                wynik_transformacji = args.to_file
                 
                 X=[]
                 Y=[]
                 Z=[]
                 for line in lines:
-                    if "geocentryczne" in line:
-                        continue
-                    else:
-                        rozdzielone_wsp=line.split(',')
-                        X.append(float(rozdzielone_wsp[0]))
-                        Y.append(float(rozdzielone_wsp[1]))
-                        Z.append(float(rozdzielone_wsp[2]))
+                    rozdzielone_wsp=line.split(',')
+                    X.append(float(rozdzielone_wsp[0]))
+                    Y.append(float(rozdzielone_wsp[1]))
+                    Z.append(float(rozdzielone_wsp[2]))
         
                 for (x,y,z) in zip(X,Y,Z):
                     #utworzy obiekt o tych współrzędnych
                     geocentryczne_grs80=Transformacje(model = "grs80")
                     phi,lam,h = geocentryczne_grs80.Hirvonen(float(x), float(y), float(z))
-                    wynik_transformacji.write(phi,lam,h)
+                    wynik_transformacji.write(str(phi)+",")
+                    wynik_transformacji.write(str(lam)+ ",")
+                    wynik_transformacji.write(str(h)+"\n")
                     
                 args.from_file.close()
                 wynik_transformacji.close()
                 
+        elif args.t == 'BLHtoXYZ':
+            lines = args.from_file.readlines()
+            wynik_transformacji = args.to_file
+            
+            B=[]
+            L=[]
+            H=[]
+            for line in lines:
+                
+                rozdzielone_wsp = line.split(',')
+                Bd = float(rozdzielone_wsp[0])
+                Bm = float(rozdzielone_wsp[1])
+                Bs = float(rozdzielone_wsp[2])
+                    
+                Bdeg=Bd+Bm/60+Bs/3600
+                B.append(Bdeg)
+                    
+                Ld = float(rozdzielone_wsp[3])
+                Lm = float(rozdzielone_wsp[4])
+                Ls = float(rozdzielone_wsp[5])
+
+                Ldeg=Ld+Lm/60+Ls/3600
+                L.append(Ldeg)
+                    
+                wys = float(rozdzielone_wsp[6])
+                H.append(wys)
+                    
+            for (b,l,h) in zip(B,L,H):
+                #utworzy obiekt o tych współrzędnych
+                geodezyjneXYZ_grs80=Transformacje(model = "grs80")
+                X, Y, Z = geodezyjneXYZ_grs80.BLHtoXYZ(float(b), float(l), float(h))
+                wynik_transformacji.write(str(X)+",")
+                wynik_transformacji.write(str(Y)+",")
+                wynik_transformacji.write(str(Z)+"\n")
+                
+            args.from_file.close()
+            wynik_transformacji.close()
+            
+                
         elif args.t =='BLHto2000':
-            with open(args.from_file, 'r'):
+            
                 lines = args.from_file.readlines()
-                wynik_transformacji = open(args.to_file, 'w')
+                wynik_transformacji = args.to_file
                 
                 B=[]
                 L=[]
                 H=[]
                 for line in lines:
-                    if "geodezyjne" in line:
-                        continue
-                    else:
-                        rozdzielone_wsp = line.split(',')
-                        Bd = rozdzielone_wsp[0]
-                        Bm = rozdzielone_wsp[1]
-                        Bs = rozdzielone_wsp[2]
+                    
+                    rozdzielone_wsp = line.split(',')
+                    Bd = float(rozdzielone_wsp[0])
+                    Bm = float(rozdzielone_wsp[1])
+                    Bs = float(rozdzielone_wsp[2])
                         
-                        Bdeg=Bd+Bm/60+Bs/3600
-                        B.append(Bdeg)
+                    Bdeg=Bd+Bm/60+Bs/3600
+                    B.append(Bdeg)
                         
-                        Ld = rozdzielone_wsp[3]
-                        Lm = rozdzielone_wsp[4]
-                        Ls = rozdzielone_wsp[5]
+                    Ld = float(rozdzielone_wsp[3])
+                    Lm = float(rozdzielone_wsp[4])
+                    Ls = float(rozdzielone_wsp[5])
 
-                        Ldeg=Ld+Lm/60+Ls/3600
-                        L.append(Ldeg)
+                    Ldeg=Ld+Lm/60+Ls/3600
+                    L.append(Ldeg)
                         
-                        wys = rozdzielone_wsp[6]
-                        H.append(wys)
+                    wys = float(rozdzielone_wsp[6])
+                    H.append(wys)
                         
                 for (b,l,h) in zip(B,L,H):
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne2000_grs80=Transformacje(model = "grs80")
                     X2000, Y2000 = geodezyjne2000_grs80.BLHto2000(float(b), float(l), float(h))
-                    print(f'Wynik transformacji BLH do układu 2000: X2000{X2000:.3f}, Y2000{Y2000:.3f}')
-                    wynik_transformacji.write(X2000, Y2000)
+                    wynik_transformacji.write(str(X2000)+",")
+                    wynik_transformacji.write(str(Y2000)+"\n")
                     
                 args.from_file.close()
                 wynik_transformacji.close()
                 
         elif args.t =='BLHto1992':
-            with open(args.from_file, 'r'):
+           
                 lines = args.from_file.readlines()
-                wynik_transformacji = open(args.to_file, 'w')
+                wynik_transformacji = args.to_file
                 
                 B=[]
                 L=[]
                 H=[]
                 for line in lines:
-                    if "geodezyjne" in line:
-                        continue
-                    else:
-                        rozdzielone_wsp = line.split(',')
-                        Bd = rozdzielone_wsp[0]
-                        Bm = rozdzielone_wsp[1]
-                        Bs = rozdzielone_wsp[2]
+                    rozdzielone_wsp = line.split(',')
+                    Bd = float(rozdzielone_wsp[0])
+                    Bm = float(rozdzielone_wsp[1])
+                    Bs = float(rozdzielone_wsp[2])
                         
-                        Bdeg=Bd+Bm/60+Bs/3600
-                        B.append(Bdeg)
+                    Bdeg=Bd+Bm/60+Bs/3600
+                    B.append(Bdeg)
                         
-                        Ld = rozdzielone_wsp[3]
-                        Lm = rozdzielone_wsp[4]
-                        Ls = rozdzielone_wsp[5]
+                    Ld = float(rozdzielone_wsp[3])
+                    Lm = float(rozdzielone_wsp[4])
+                    Ls = float(rozdzielone_wsp[5])
 
-                        Ldeg=Ld+Lm/60+Ls/3600
-                        L.append(Ldeg)
+                    Ldeg=Ld+Lm/60+Ls/3600
+                    L.append(Ldeg)
                         
-                        wys = rozdzielone_wsp[6]
-                        H.append(wys)
+                    wys = float(rozdzielone_wsp[6])
+                    H.append(wys)
                         
                 for (b,l,h) in zip(B,L,H):
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne1992_grs80=Transformacje(model = "grs80")
                     X1992, Y1992 = geodezyjne1992_grs80.BLHto1992(float(b), float(l), float(h))
-                    print(f'Wynik transformacji BLH do układu 1992: X1992{X1992:.3f}, Y1992{Y1992:.3f}')
-                    wynik_transformacji.write(X1992, Y1992)
+                    wynik_transformacji.write(str(X1992)+",")
+                    wynik_transformacji.write(str(Y1992)+"\n")
                     
                 args.from_file.close()
                 wynik_transformacji.close()
                 
                 
+                
+                
     elif args.m == 'wgs84':
         if args.t == 'Hirvonen':
-            with open(args.from_file, 'r'):
                 lines = args.from_file.readlines()
-                wynik_transformacji = open(args.to_file, 'w')
+                wynik_transformacji = args.to_file
                 
                 X=[]
                 Y=[]
                 Z=[]
                 for line in lines:
-                    if "geocentryczne" in line:
-                        continue
-                    else:
-                        rozdzielone_wsp=line.split(',')
-                        X.append(rozdzielone_wsp[0])
-                        Y.append(rozdzielone_wsp[1])
-                        Z.append(rozdzielone_wsp[2])
+                    rozdzielone_wsp=line.split(',')
+                    X.append(float(rozdzielone_wsp[0]))
+                    Y.append(float(rozdzielone_wsp[1]))
+                    Z.append(float(rozdzielone_wsp[2]))
         
                 for (x,y,z) in zip(X,Y,Z):
                     #utworzy obiekt o tych współrzędnych
                     geocentryczne_wgs84=Transformacje(model = "wgs84")
                     phi,lam,h = geocentryczne_wgs84.Hirvonen(float(x), float(y), float(z))
-                    wynik_transformacji.write(phi,lam,h)
+                    wynik_transformacji.write(str(phi)+",")
+                    wynik_transformacji.write(str(lam)+",")
+                    wynik_transformacji.write(str(h)+"\n")
                     
                 args.from_file.close()
                 wynik_transformacji.close()
                 
+        elif args.t == 'BLHtoXYZ':
+            lines = args.from_file.readlines()
+            wynik_transformacji = args.to_file
+            
+            B=[]
+            L=[]
+            H=[]
+            for line in lines:
+                
+                rozdzielone_wsp = line.split(',')
+                Bd = float(rozdzielone_wsp[0])
+                Bm = float(rozdzielone_wsp[1])
+                Bs = float(rozdzielone_wsp[2])
+                    
+                Bdeg=Bd+Bm/60+Bs/3600
+                B.append(Bdeg)
+                    
+                Ld = float(rozdzielone_wsp[3])
+                Lm = float(rozdzielone_wsp[4])
+                Ls = float(rozdzielone_wsp[5])
+
+                Ldeg=Ld+Lm/60+Ls/3600
+                L.append(Ldeg)
+                    
+                wys = float(rozdzielone_wsp[6])
+                H.append(wys)
+                    
+            for (b,l,h) in zip(B,L,H):
+                #utworzy obiekt o tych współrzędnych
+                geodezyjneXYZ_wgs84=Transformacje(model = "wgs84")
+                X, Y, Z = geodezyjneXYZ_wgs84.BLHtoXYZ(float(b), float(l), float(h))
+                wynik_transformacji.write(str(X)+",")
+                wynik_transformacji.write(str(Y)+",")
+                wynik_transformacji.write(str(Z)+"\n")
+                
+            args.from_file.close()
+            wynik_transformacji.close()
+            
+                
         elif args.t =='BLHto2000':
-            with open(args.from_file, 'r'):
                 lines = args.from_file.readlines()
-                wynik_transformacji = open(args.to_file, 'w')
+                wynik_transformacji = args.to_file
                 
                 B=[]
                 L=[]
                 H=[]
                 for line in lines:
-                    if "geodezyjne" in line:
-                        continue
-                    else:
-                        rozdzielone_wsp = line.split(',')
-                        Bd = rozdzielone_wsp[0]
-                        Bm = rozdzielone_wsp[1]
-                        Bs = rozdzielone_wsp[2]
+                    rozdzielone_wsp = line.split(',')
+                    Bd = float(rozdzielone_wsp[0])
+                    Bm = float(rozdzielone_wsp[1])
+                    Bs = float(rozdzielone_wsp[2])
                         
-                        Bdeg=Bd+Bm/60+Bs/3600
-                        B.append(Bdeg)
+                    Bdeg=Bd+Bm/60+Bs/3600
+                    B.append(Bdeg)
                         
-                        Ld = rozdzielone_wsp[3]
-                        Lm = rozdzielone_wsp[4]
-                        Ls = rozdzielone_wsp[5]
+                    Ld = float(rozdzielone_wsp[3])
+                    Lm = float(rozdzielone_wsp[4])
+                    Ls = float(rozdzielone_wsp[5])
 
-                        Ldeg=Ld+Lm/60+Ls/3600
-                        L.append(Ldeg)
+                    Ldeg=Ld+Lm/60+Ls/3600
+                    L.append(Ldeg)
                         
-                        wys = rozdzielone_wsp[6]
-                        H.append(wys)
+                    wys = float(rozdzielone_wsp[6])
+                    H.append(wys)
                         
                 for (b,l,h) in zip(B,L,H):
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne2000_wgs84=Transformacje(model = "wgs84")
                     X2000, Y2000 = geodezyjne2000_wgs84.BLHto2000(float(b), float(l), float(h))
-                    print(f'Wynik transformacji BLH do układu 2000: X2000{X2000:.3f}, Y2000{Y2000:.3f}')
-                    wynik_transformacji.write(X2000, Y2000)
+                    wynik_transformacji.write(str(X2000)+",")
+                    wynik_transformacji.write(str(Y2000)+"\n")
                     
                 args.from_file.close()
                 wynik_transformacji.close()
                 
         elif args.t =='BLHto1992':
-            with open(args.from_file, 'r'):
                 lines = args.from_file.readlines()
-                wynik_transformacji = open(args.to_file, 'w')
+                wynik_transformacji = args.to_file
                 
                 B=[]
                 L=[]
                 H=[]
                 for line in lines:
-                    if "geodezyjne" in line:
-                        continue
-                    else:
-                        rozdzielone_wsp = line.split(',')
-                        Bd = rozdzielone_wsp[0]
-                        Bm = rozdzielone_wsp[1]
-                        Bs = rozdzielone_wsp[2]
+                    rozdzielone_wsp = line.split(',')
+                    Bd = float(rozdzielone_wsp[0])
+                    Bm = float(rozdzielone_wsp[1])
+                    Bs = float(rozdzielone_wsp[2])
                         
-                        Bdeg=Bd+Bm/60+Bs/3600
-                        B.append(Bdeg)
+                    Bdeg=Bd+Bm/60+Bs/3600
+                    B.append(Bdeg)
                         
-                        Ld = rozdzielone_wsp[3]
-                        Lm = rozdzielone_wsp[4]
-                        Ls = rozdzielone_wsp[5]
+                    Ld = float(rozdzielone_wsp[3])
+                    Lm = float(rozdzielone_wsp[4])
+                    Ls = float(rozdzielone_wsp[5])
 
-                        Ldeg=Ld+Lm/60+Ls/3600
-                        L.append(Ldeg)
+                    Ldeg=Ld+Lm/60+Ls/3600
+                    L.append(Ldeg)
                         
-                        wys = rozdzielone_wsp[6]
-                        H.append(wys)
+                    wys = float(rozdzielone_wsp[6])
+                    H.append(wys)
                         
                 for (b,l,h) in zip(B,L,H):
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne1992_wgs84=Transformacje(model = "wgs84")
                     X1992, Y1992 = geodezyjne1992_wgs84.BLHto1992(float(b), float(l), float(h))
-                    print(f'Wynik transformacji BLH do układu 1992: X1992{X1992:.3f}, Y1992{Y1992:.3f}')
-                    wynik_transformacji.write(X1992, Y1992)
+                    wynik_transformacji.write(str(X1992) +",")
+                    wynik_transformacji.write(str(Y1992) +"\n")
                     
                 args.from_file.close()
                 wynik_transformacji.close()
                 
                 
+                
+                
     elif args.m == 'krassowski':
         if args.t == 'Hirvonen':
-            with open(args.from_file, 'r'):
                 lines = args.from_file.readlines()
-                wynik_transformacji = open(args.to_file, 'w')
+                wynik_transformacji = args.to_file
                 
                 X=[]
                 Y=[]
                 Z=[]
                 for line in lines:
-                    if "geocentryczne" in line:
-                        continue
-                    else:
-                        rozdzielone_wsp=line.split(',')
-                        X.append(rozdzielone_wsp[0])
-                        Y.append(rozdzielone_wsp[1])
-                        Z.append(rozdzielone_wsp[2])
+                    rozdzielone_wsp=line.split(',')
+                    X.append(float(rozdzielone_wsp[0]))
+                    Y.append(float(rozdzielone_wsp[1]))
+                    Z.append(float(rozdzielone_wsp[2]))
         
                 for (x,y,z) in zip(X,Y,Z):
                     #utworzy obiekt o tych współrzędnych
                     geocentryczne_krassowski=Transformacje(model = "krassowski")
                     phi,lam,h = geocentryczne_krassowski.Hirvonen(float(x), float(y), float(z))
-                    wynik_transformacji.write(phi,lam,h)
+                    wynik_transformacji.write(str(phi)+ ",")
+                    wynik_transformacji.write(str(lam)+ ",")
+                    wynik_transformacji.write(str(h)+ "\n")
                     
                 args.from_file.close()
                 wynik_transformacji.close()
                 
+        elif args.t == 'BLHtoXYZ':
+            lines = args.from_file.readlines()
+            wynik_transformacji = args.to_file
+            
+            B=[]
+            L=[]
+            H=[]
+            for line in lines:
+                
+                rozdzielone_wsp = line.split(',')
+                Bd = float(rozdzielone_wsp[0])
+                Bm = float(rozdzielone_wsp[1])
+                Bs = float(rozdzielone_wsp[2])
+                    
+                Bdeg=Bd+Bm/60+Bs/3600
+                B.append(Bdeg)
+                    
+                Ld = float(rozdzielone_wsp[3])
+                Lm = float(rozdzielone_wsp[4])
+                Ls = float(rozdzielone_wsp[5])
+
+                Ldeg=Ld+Lm/60+Ls/3600
+                L.append(Ldeg)
+                    
+                wys = float(rozdzielone_wsp[6])
+                H.append(wys)
+                    
+            for (b,l,h) in zip(B,L,H):
+                #utworzy obiekt o tych współrzędnych
+                geodezyjneXYZ_krassowski=Transformacje(model = "krassowski")
+                X, Y, Z = geodezyjneXYZ_krassowski.BLHtoXYZ(float(b), float(l), float(h))
+                wynik_transformacji.write(str(X)+",")
+                wynik_transformacji.write(str(Y)+",")
+                wynik_transformacji.write(str(Z)+"\n")
+                
+            args.from_file.close()
+            wynik_transformacji.close()
+            
+                
         elif args.t =='BLHto2000':
-            with open(args.from_file, 'r'):
                 lines = args.from_file.readlines()
-                wynik_transformacji = open(args.to_file, 'w')
+                wynik_transformacji = args.to_file
                 
                 B=[]
                 L=[]
                 H=[]
                 for line in lines:
-                    if "geodezyjne" in line:
-                        continue
-                    else:
-                        rozdzielone_wsp = line.split(',')
-                        Bd = rozdzielone_wsp[0]
-                        Bm = rozdzielone_wsp[1]
-                        Bs = rozdzielone_wsp[2]
+                    rozdzielone_wsp = line.split(',')
+                    Bd = float(rozdzielone_wsp[0])
+                    Bm = float(rozdzielone_wsp[1])
+                    Bs = float(rozdzielone_wsp[2])
                         
-                        Bdeg=Bd+Bm/60+Bs/3600
-                        B.append(Bdeg)
+                    Bdeg=Bd+Bm/60+Bs/3600
+                    B.append(Bdeg)
                         
-                        Ld = rozdzielone_wsp[3]
-                        Lm = rozdzielone_wsp[4]
-                        Ls = rozdzielone_wsp[5]
+                    Ld = float(rozdzielone_wsp[3])
+                    Lm = float(rozdzielone_wsp[4])
+                    Ls = float(rozdzielone_wsp[5])
 
-                        Ldeg=Ld+Lm/60+Ls/3600
-                        L.append(Ldeg)
+                    Ldeg=Ld+Lm/60+Ls/3600
+                    L.append(Ldeg)
                         
-                        wys = rozdzielone_wsp[6]
-                        H.append(wys)
+                    wys = float(rozdzielone_wsp[6])
+                    H.append(wys)
                         
                 for (b,l,h) in zip(B,L,H):
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne2000_krassowski=Transformacje(model = "krassowski")
                     X2000, Y2000 = geodezyjne2000_krassowski.BLHto2000(float(b), float(l), float(h))
-                    print(f'Wynik transformacji BLH do układu 2000: X2000{X2000:.3f}, Y2000{Y2000:.3f}')
-                    wynik_transformacji.write(X2000, Y2000)
+                    wynik_transformacji.write(str(X2000) +",")
+                    wynik_transformacji.write(str(Y2000) +"\n")
                     
                 args.from_file.close()
                 wynik_transformacji.close()
                 
         elif args.t =='BLHto1992':
-            with open(args.from_file, 'r'):
                 lines = args.from_file.readlines()
-                wynik_transformacji = open(args.to_file, 'w')
+                wynik_transformacji = args.to_file
                 
                 B=[]
                 L=[]
                 H=[]
                 for line in lines:
-                    if "geodezyjne" in line:
-                        continue
-                    else:
-                        rozdzielone_wsp = line.split(',')
-                        Bd = rozdzielone_wsp[0]
-                        Bm = rozdzielone_wsp[1]
-                        Bs = rozdzielone_wsp[2]
+                    rozdzielone_wsp = line.split(',')
+                    Bd = float(rozdzielone_wsp[0])
+                    Bm = float(rozdzielone_wsp[1])
+                    Bs = float(rozdzielone_wsp[2])
                         
-                        Bdeg=Bd+Bm/60+Bs/3600
-                        B.append(Bdeg)
+                    Bdeg=Bd+Bm/60+Bs/3600
+                    B.append(Bdeg)
                         
-                        Ld = rozdzielone_wsp[3]
-                        Lm = rozdzielone_wsp[4]
-                        Ls = rozdzielone_wsp[5]
+                    Ld = float(rozdzielone_wsp[3])
+                    Lm = float(rozdzielone_wsp[4])
+                    Ls = float(rozdzielone_wsp[5])
 
-                        Ldeg=Ld+Lm/60+Ls/3600
-                        L.append(Ldeg)
+                    Ldeg=Ld+Lm/60+Ls/3600
+                    L.append(Ldeg)
                         
-                        wys = rozdzielone_wsp[6]
-                        H.append(wys)
+                    wys = float(rozdzielone_wsp[6])
+                    H.append(wys)
                         
                 for (b,l,h) in zip(B,L,H):
                     #utworzy obiekt o tych współrzędnych
-                    geodezyjne1992_krassowski=Transformacje(model = "krasowski")
+                    geodezyjne1992_krassowski=Transformacje(model = "krassowski")
                     X1992, Y1992 = geodezyjne1992_krassowski.BLHto1992(float(b), float(l), float(h))
-                    print(f'Wynik transformacji BLH do układu 1992: X1992{X1992:.3f}, Y1992{Y1992:.3f}')
-                    wynik_transformacji.write(X1992, Y1992)
+                    wynik_transformacji.write(str(X1992) + ",")
+                    wynik_transformacji.write(str(Y1992) + "\n")
                     
                 args.from_file.close()
                 wynik_transformacji.close()
