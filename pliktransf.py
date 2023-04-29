@@ -244,8 +244,8 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Transformacje współrzędnych')
     parser.add_argument('-m', type=str, help='Model elipsoidy', choices=['wgs84', 'grs80', 'krassowski'] )
     parser.add_argument('-t', type=str, help='Rodzaj transformacji', choices=['Hirvonen','BLH21992', 'BLHto2000', 'dXYZtoNEU'])
-    parser.add_argument('-from_file', help='Ścieżka do pliku/nazwa pliku z którego pobieramy dane')
-    parser.add_argument('-to_file', help='Ścieżka do pliku/nazwa pliku do którego zapisujemy dane')
+    parser.add_argument('-from_file', type=str, help='Ścieżka do pliku/nazwa pliku z którego pobieramy dane')
+    parser.add_argument('-to_file', type=str, help='Ścieżka do pliku/nazwa pliku do którego zapisujemy dane')
     
     args = parser.parse_args()
     
@@ -265,9 +265,9 @@ if __name__=='__main__':
                         continue
                     else:
                         rozdzielone_wsp=line.split(',')
-                        X.append(rozdzielone_wsp[0])
-                        Y.append(rozdzielone_wsp[1])
-                        Z.append(rozdzielone_wsp[2])
+                        X.append(float(rozdzielone_wsp[0]))
+                        Y.append(float(rozdzielone_wsp[1]))
+                        Z.append(float(rozdzielone_wsp[2]))
         
                 for (x,y,z) in zip(X,Y,Z):
                     #utworzy obiekt o tych współrzędnych
