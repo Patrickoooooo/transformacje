@@ -24,16 +24,20 @@ współrzędne, zapisane w następującej kolejności: X, Y, Z, przy czym wspó�
 a części dziesiętne oddzielone od jedności kropką. 
 Przykładowo dla jednego punktu: 1000.000, 1200.000, 1300.000
 Dane wyjściowe zostaną zapisane jako: B(decimal), B(minutes), B(seconds), L(decimal), L(minutes), L(seconds), H (metry).
+(Przykładowy plik z danymi wyjściowymi dla tej transformacji znajduje się na repozytorium pod nazwą wspolrzedne_geocentryczne.txt, a przykładowy plik z danymi wyjściowymi pod nazwą wynik_Hirvonen.txt)
 
 b) W przypadku współrzędnych geodezyjnych jako danych wejściowych plik tekstowy powiniem zawierać w kolejnych liniach owe współrzędne 
 zapisane w następującej kolejności: B(decimal), B(minutes), B(seconds), L(decimal), L(minutes), L(seconds), H przy czym współrzędne musza być one oddzielone od siebie przecinkami, a części dziesiętne oddzielone od jedności kropką.
 Przykładowo dla jednego punktu: 52,16,22.000,17,11,21.888,131.000
 W przypadku transformacji do współrzędnych geocentrycznych dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X,Y,Z, 
 przy czym każda ze współrzędnych podana w metrach i określona do części tysięcznych. 
+(Przykładowy plik z danymi wyjściowymi dla tej transformacji znajduje się na repozytorium pod nazwą wspolrzedne_geodezyjne.txt, a przykładowy plik z danymi wyjściowymi pod nazwą wynik_BLHtoXYZ.txt)
 W przypadku transformacji do układu 1992 dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X1992,Y1992 
 przy czym każda ze współrzędnych podana w metrach i określona do części tysięcznych.
+(Przykładowy plik z danymi wyjściowymi dla tej transformacji znajduje się na repozytorium pod nazwą wspolrzedne_geodezyjne.txt, a przykładowy plik z danymi wyjściowymi pod nazwą wynik_BLHto1992.txt)
 W przypadku transformacji do układu 2000 dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X2000,Y2000 
 przy czym każda ze współrzędnych podana w metrach i określona do części tysięcznych.
+(Przykładowy plik z danymi wyjściowymi dla tej transformacji znajduje się na repozytorium pod nazwą wspolrzedne_geodezyjne.txt, a przykładowy plik z danymi wyjściowymi pod nazwą wynik_BLHto2000.txt)
 
 
 c) W przypadku współrzędnych geocentrycznych XYZ satelity i współrzędnych geocentrycznych XYZ anteny jako danych wejściowych
@@ -42,6 +46,7 @@ X satelity, Y satelity, Zp satelity, X anteny, Y anteny, Z anteny  przy czym wsp
 a części dziesiętne oddzielone od jedności kropką. 
 Przykładowo dla jednego satelity i jednej anteny:  1000000.000, 1200000.000, 1300000.000, 1001.000, 1202.000, 1303.000
 Dane wyjściowe zostaną zapisane jako współrzędne topocentryczne anteny: northing, easting, up przy czym każda ze współrzędnych podana w metrach i zaokrąglona do części tysięcznych.
+(Przykładowy plik z danymi wyjściowymi dla tej transformacji znajduje się na repozytorium pod nazwą wspolrzedne_XYZtoNEU.txt, a przykładowy plik z danymi wyjściowymi pod nazwą wynik_NEU.txt)
 
 Aby skorzystać z programu i danych zapisanych na pliku wejściowym, wywołujemy go przez wiersz poleceń. Program korzysta z biblioteki argparse, 
 zatem przy wowołaniu podajemy argumenty. Argument "-m" oznacza model elipsoidy, na której dokonujemy przeliczeń współrzędnych, przy czym program obsługuje trzy, które użytkownik ma do wyboru: "wgs84","grs80", "krassowski".
