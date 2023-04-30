@@ -50,6 +50,7 @@ Argument ,,-from_file" oznacza plik z którego program pobiera dane wejściowe d
 Przykładowo:
 
 C:\Users\Patryk\transformacje>python pliktransf.py -m grs80 -t BLHtoXYZ -from_file wspolrzedne_geodezyjne.txt -to_file wynik_BLHtoXYZ.txt
+
 W tym przypadku użytkownik wybrał model elipsoidy GRS80, transformację przeliczającą BHLtoXYZ (współrzędne BLH do współrzędnych geocentrycznych XYZ). Jako plik z danymi wejściowymi podał ten o nazwie „wspolrzedne_geodezyjne.txt”, a jako plik do zapisania danych wyjściowych plik o nazwie „wynik_BLHtoXYZ” .
 
 
