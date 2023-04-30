@@ -6,7 +6,7 @@ przeliczenie współrzędnych geocentrycznych XYZ na współrzędne geodezyjne B
 przeliczenie współrzędnych geodezyjnych BLH do współrzędnych prostokątnych w układzie 2000, 
 przeliczenie współrzędnych geodezyjnych BLH do współrzędnych prostokątnych w układzie 1992, 
 przeliczenie współrzędnych geodezyjnych BLH do współrzędnych geocentrycznych XYZ, 
-przeliczenie współrzędnych geocentrycznych XYZ (satelity i anteny) do współrzędnych topocentrycznych NEU, 
+przeliczenie współrzędnych geocentrycznych XYZ (satelity i anteny) do współrzędnych topocentrycznych NEU anteny. 
 
 Program obsługuje parametry modeli elipsoid: GRS80, WGS84, Krassowskiego
 
