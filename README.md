@@ -30,11 +30,11 @@ b) W przypadku współrzędnych geodezyjnych jako danych wejściowych plik tekst
 zapisane w następującej kolejności: B(decimal), B(minutes), B(seconds), L(decimal), L(minutes), L(seconds), H przy czym współrzędne musza być one oddzielone od siebie przecinkami, a części dziesiętne oddzielone od jedności kropką.
 Przykładowo: 52,16,22.000,17,11,21.888,131.000
 W przypadku transformacji do współrzędnych geocentrycznych dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X,Y,Z, 
-przy czym każda ze współrzędnych określona do części tysięcznych. 
+przy czym każda ze współrzędnych podana w metrach i określona do części tysięcznych. 
 W przypadku transformacji do układu 1992 dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X1992,Y1992 
-przy czym każda ze współrzędnych określona do części tysięcznych.
+przy czym każda ze współrzędnych podana w metrach i określona do części tysięcznych.
 W przypadku transformacji do układu 2000 dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X2000,Y2000 
-przy czym każda ze współrzędnych określona do części tysięcznych.
+przy czym każda ze współrzędnych podana w metrach i określona do części tysięcznych.
 
 
 c) W przypadku współrzędnych geocentrycznych XYZ początka odcinka i współrzędnych geocentrycznych XYZ końca odcinka jako danych wejściowych
