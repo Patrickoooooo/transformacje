@@ -14,7 +14,7 @@ Program obsługuje parametry modeli elipsoid: GRS80, WGS84, Krassowskiego
 2. WYMAGANIA:
 Aby program zadziałał na danym komputerze/laptopie musi on mieć zainstalowanego Pythona wersję 3.10, bibliotekę Numpy, bibliotekę Argparse, a także zintegrowane środowisko-Spyder wersja 5.1.5.
 
-3. SYSTEM OPERACUJNY NA KOMPUTERZE A PROGRAM:
+3. SYSTEM OPERACYJNY NA KOMPUTERZE A PROGRAM:
 Program został napisany dla systemu operacyjnego Windows 10
 
 4. UŻYTKOWANIE PROGRAMU:
