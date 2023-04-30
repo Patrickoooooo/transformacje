@@ -61,7 +61,7 @@ class Transformacje:
             h = p / np.cos(phi_poprzednie) - N
             phi = np.arctan((Z/p) * (((1 - self.ecc2 * N/(N + h))**(-1))))
         lam = np.arctan(Y/X)
-        N = self.a / np.sqrt(1 - self.ecc2 * (np.sin(phi))**2);
+        N = self.a / np.sqrt(1 - self.ecc2 * (np.sin(phi))**2)
         h = p / np.cos(phi) - N       
         
         return np.rad2deg(phi), np.rad2deg(lam), h 
@@ -223,58 +223,64 @@ class Transformacje:
             return X1992, Y1992
         
         
-    #def dXYZ2NEU(self, xp, yp, zp, xk, yk, zk):
-        #'''
-        #XYZ -> NEUp -
-        #Transformacja z układu współrzędnych geocentrcznych XYZ 
-        #na układ współrzędnych topograficznych NEU (układ lokalny związany z punktem odniesienia), 
-        #służy do dokładnego okreslenia położenia punktu w lokalnym układzie współrzędnych.
-        #PARAMETERS
-        #-------
-        #xp, yp, zp : FLOAT
-        #     współrzędne geocentryczne punktu początkowego
-        #xk, yk, zk : FLOAT
-        #     współrzędne geocentryczne punktu końcowego     
+    def dXYZtoNEU(self, x, y, z, x0, y0, z0):
+        '''
+        dXYZ -> NEUp 
+        Transformacja z układu współrzędnych geocentrcznych XYZ 
+        na układ współrzędnych topograficznych NEU (układ lokalny związany z punktem odniesienia), 
+        służy do dokładnego okreslenia położenia punktu w lokalnym układzie współrzędnych. 
+        
+        PARAMETERS
+        -------
+        x, y, z : FLOAT
+             współrzędne geocentryczne satelity
+        x0, y0, z0 : FLOAT
+             współrzędne geocentryczne anteny     
 
-        #Returns
-        #-------
-        #X2000
-        #    [metry] - współrzędna prostokątna płaska X
-        #Y2000
-        #    [metry] - współrzędna prostokątna płaska Y 
-
-
-        #'''
-        #współrzędne początku  φ λ -> XYZ 
-        #N = self.a / np.sqrt(1 - self.ecc2 * np.sin(phi)**2)
+        Returns
+        -------
+        N
+             współrzędna topograficzna northing anteny [metry]
+        E
+             współrzędna topograficzna easting anteny [metry]
+        U
+             współrzędna topograficzna up anteny [metry]
+           
+        '''
+        p   = np.sqrt(x0**2 + y0**2)           # promień
+        phi_poprzednie= np.arctan(z0 / (p * (1 - self.ecc2)))    
+        phi = 0
+        while abs(phi_poprzednie - phi) > 0.000001/206265:    
+            phi_poprzednie = phi
+            N = self.a / np.sqrt(1 - self.ecc2 * np.sin(phi_poprzednie)**2)
+            h = p / np.cos(phi_poprzednie) - N
+            phi = np.arctan((z0/p) * (((1 - self.ecc2 * N/(N + h))**(-1))))
+            
+        lam = np.arctan(y0/x0)
         
         #obliczenie współrzędnych XYZ
-        #dxyz = np.array([xk,yk,zk]) - np.array([xp,yp,zp])
-        #X, Y, Z = dxyz - np.array([X0, Y0, Z0])
+        dXYZt = np.array([x,y,z]) - np.array([x0,y0,z0])
     
         # Macierz obrotu
-        #sin_phi = np.sin(phi)
-        #cos_phi = np.cos(phi)
-        #sin_lam = np.sin(lam)
-        #cos_lam = np.cos(lam)
+        sin_phi = np.sin(phi)
+        cos_phi = np.cos(phi)
+        sin_lam = np.sin(lam)
+        cos_lam = np.cos(lam)
+        
     
-        #R = np.array([[-sin_lam,           cos_lam,           0],
-                      #[-sin_phi*cos_lam, -sin_phi*sin_lam,  cos_phi],
-                      #[ cos_phi*cos_lam,  cos_phi*sin_lam,  sin_phi]])
+        Rt = np.array([[-sin_lam,           cos_lam,           0],
+                      [-sin_phi*cos_lam, -sin_phi*sin_lam,  cos_phi],
+                      [ cos_phi*cos_lam,  cos_phi*sin_lam,  sin_phi]])
     
         # Obliczenie współrzędnych NEU
-        #NEU = np.dot(R, np.array([X, Y, Z]))
+        NEU = Rt @ dXYZt
     
      
-        #N = NEU[0]
-        #E = NEU[1]
-        #U = -NEU[2]
+        E = NEU[0]
+        N = NEU[1]
+        U = NEU[2]
     
-    
-        #phi_stopnie = np.degrees(phi)
-        #lam_stopnie = np.degrees(lam)
-    
-        #return (N, E, U, phi_stopnie, lam_stopnie)
+        return N, E, U
 
 if __name__=='__main__':
     
@@ -364,6 +370,41 @@ if __name__=='__main__':
             wynik_transformacji.close()
             
                 
+        elif args.t == 'dXYZtoNEU':
+            lines = args.from_file.readlines()
+            wynik_transformacji = args.to_file
+            
+            x_satelity=[]
+            y_satelity=[]
+            z_satelity=[]
+            x_anteny=[]
+            y_anteny=[]
+            z_anteny=[]
+            
+            for line in lines:
+                
+                rozdzielone_wsp = line.split(',')
+                x_satelity.append(float(rozdzielone_wsp[0]))
+                y_satelity.append(float(rozdzielone_wsp[1]))
+                z_satelity.append(float(rozdzielone_wsp[2]))
+                    
+                x_anteny.append(float(rozdzielone_wsp[3]))
+                y_anteny.append(float(rozdzielone_wsp[4]))
+                z_anteny.append(float(rozdzielone_wsp[5]))
+
+                
+            for (x,y,z,x0,y0,z0) in zip(x_satelity,y_satelity,z_satelity,x_anteny,y_anteny,z_anteny):
+                
+                #utworzy obiekt o tych współrzędnych
+                NEU_grs80=Transformacje(model = "grs80")
+                N, E, U = NEU_grs80.dXYZtoNEU(float(x), float(y), float(z),float(x0), float(y0), float(z0))
+                zapis= f'{N:.3f} , {E:.3f}, {U:.3f} \n'
+                wynik_transformacji.write(zapis)
+                
+                
+            args.from_file.close()
+            wynik_transformacji.close()
+            
         elif args.t =='BLHto2000':
             
                 lines = args.from_file.readlines()
@@ -472,6 +513,43 @@ if __name__=='__main__':
                     
                 args.from_file.close()
                 wynik_transformacji.close()
+                
+                
+        elif args.t == 'dXYZtoNEU':
+            lines = args.from_file.readlines()
+            wynik_transformacji = args.to_file
+            
+            x_satelity=[]
+            y_satelity=[]
+            z_satelity=[]
+            x_anteny=[]
+            y_anteny=[]
+            z_anteny=[]
+            
+            for line in lines:
+                
+                rozdzielone_wsp = line.split(',')
+                x_satelity.append(float(rozdzielone_wsp[0]))
+                y_satelity.append(float(rozdzielone_wsp[1]))
+                z_satelity.append(float(rozdzielone_wsp[2]))
+                    
+                x_anteny.append(float(rozdzielone_wsp[3]))
+                y_anteny.append(float(rozdzielone_wsp[4]))
+                z_anteny.append(float(rozdzielone_wsp[5]))
+
+                
+            for (x,y,z,x0,y0,z0) in zip(x_satelity,y_satelity,z_satelity,x_anteny,y_anteny,z_anteny):
+                
+                #utworzy obiekt o tych współrzędnych
+                NEU_wgs84=Transformacje(model = "wgs84")
+                N, E, U = NEU_wgs84.dXYZtoNEU(float(x), float(y), float(z),float(x0), float(y0), float(z0))
+                zapis= f'{N:.3f} , {E:.3f}, {U:.3f} \n'
+                wynik_transformacji.write(zapis)
+                
+                
+            args.from_file.close()
+            wynik_transformacji.close()
+                
                 
         elif args.t == 'BLHtoXYZ':
             lines = args.from_file.readlines()
@@ -617,6 +695,42 @@ if __name__=='__main__':
                     
                 args.from_file.close()
                 wynik_transformacji.close()
+                
+        elif args.t == 'dXYZtoNEU':
+            lines = args.from_file.readlines()
+            wynik_transformacji = args.to_file
+            
+            x_satelity=[]
+            y_satelity=[]
+            z_satelity=[]
+            x_anteny=[]
+            y_anteny=[]
+            z_anteny=[]
+            
+            for line in lines:
+                
+                rozdzielone_wsp = line.split(',')
+                x_satelity.append(float(rozdzielone_wsp[0]))
+                y_satelity.append(float(rozdzielone_wsp[1]))
+                z_satelity.append(float(rozdzielone_wsp[2]))
+                    
+                x_anteny.append(float(rozdzielone_wsp[3]))
+                y_anteny.append(float(rozdzielone_wsp[4]))
+                z_anteny.append(float(rozdzielone_wsp[5]))
+
+                
+            for (x,y,z,x0,y0,z0) in zip(x_satelity,y_satelity,z_satelity,x_anteny,y_anteny,z_anteny):
+                
+                #utworzy obiekt o tych współrzędnych
+                NEU_krassowski=Transformacje(model = "krassowski")
+                N, E, U = NEU_krassowski.dXYZtoNEU(float(x), float(y), float(z),float(x0), float(y0), float(z0))
+                zapis= f'{N:.3f} , {E:.3f}, {U:.3f} \n'
+                wynik_transformacji.write(zapis)
+                
+                
+            args.from_file.close()
+            wynik_transformacji.close()
+                
                 
         elif args.t == 'BLHtoXYZ':
             lines = args.from_file.readlines()
