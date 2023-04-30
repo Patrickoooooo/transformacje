@@ -28,6 +28,7 @@ Dane wyjściowe zostaną zapisane jako: B(decimal), B(minutes), B(seconds), L(de
 
 b) W przypadku współrzędnych geodezyjnych jako danych wejściowych plik tekstowy powiniem zawierać w kolejnych liniach owe współrzędne 
 zapisane w następującej kolejności: B(decimal), B(minutes), B(seconds), L(decimal), L(minutes), L(seconds), H przy czym współrzędne musza być one oddzielone od siebie przecinkami, a części dziesiętne oddzielone od jedności kropką.
+
 Przykładowo: 52,16,22.000,17,11,21.888,131.000
 W przypadku transformacji do współrzędnych geocentrycznych dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X,Y,Z, 
 przy czym każda ze współrzędnych określona do części tysięcznych. 
