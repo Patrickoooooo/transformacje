@@ -43,7 +43,7 @@ Xpoczątkowe, Ypoczątkowe, Zpoczątkowe, Xkońcowe, Ykońcowe, Zkońcowe  przy 
 a części dziesiętne oddzielone od jedności kropką. 
 Przykładowo:  1000.000, 1200.000, 1300.000, 1001.000, 1202.000, 1303.000
 
-Aby skorzystać z programu i danych zapisanych na pliku wyjściowych, wywołujemy go przez wiersz poleceń. Program korzysta z biblioteki argparse, 
+Aby skorzystać z programu i danych zapisanych na pliku wejściowym, wywołujemy go przez wiersz poleceń. Program korzysta z biblioteki argparse, 
 zatem przy wowołaniu podajemy argumenty. Argument "-m" oznacza model elipsoidy, na której dokonujemy przeliczeń współrzędnych, przy czym program obsługuje trzy, które użytkownik ma do wyboru: "wgs84","grs80", "krassowski".
 "-t" oznacza transformację, z jakiej użytkownik chce skorzystać, przy czym ma do wyboru: "Hirvonen", "BLHtoXYZ", "BLHto2000", "BLHto1992".
 Argument ,,-from_file" oznacza plik z którego program pobiera dane wejściowe dla danej transformacji, a argument "-to_file" plik do którego zostaną zapisane dane wyjściowe. Przy owych polach jako argument użytkownik musi podać ścieżkę/nazwę pliku.
