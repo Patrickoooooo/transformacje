@@ -460,9 +460,15 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geocentryczne_wgs84=Transformacje(model = "wgs84")
                     phi,lam,h = geocentryczne_wgs84.Hirvonen(float(x), float(y), float(z))
+                    phi_deg=np.trunc(phi)
+                    phi_mnt=np.trunc((phi-phi_deg)*60) 
+                    phi_sec=(((phi-phi_deg)*60)-phi_mnt)*60
                     
-                    
-                    
+                    lam_deg=np.trunc(lam)
+                    lam_mnt=np.trunc((lam-lam_deg)*60) 
+                    lam_sec=(((lam-lam_deg)*60)-lam_mnt)*60
+                    zapis=f'{phi_deg:.0f},{abs(phi_mnt):.0f},{abs(phi_sec):.5f},{lam_deg:.0f},{abs(lam_mnt):.0f},{abs(lam_sec):.5f}, {h:.3f} \n'
+                    wynik_transformacji.write(zapis)
                     
                 args.from_file.close()
                 wynik_transformacji.close()
@@ -598,9 +604,16 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geocentryczne_krassowski=Transformacje(model = "krassowski")
                     phi,lam,h = geocentryczne_krassowski.Hirvonen(float(x), float(y), float(z))
+                    phi_deg=np.trunc(phi)
+                    phi_mnt=np.trunc((phi-phi_deg)*60) 
+                    phi_sec=(((phi-phi_deg)*60)-phi_mnt)*60
                     
+                    lam_deg=np.trunc(lam)
+                    lam_mnt=np.trunc((lam-lam_deg)*60) 
+                    lam_sec=(((lam-lam_deg)*60)-lam_mnt)*60
                     
-                    
+                    zapis=f'{phi_deg:.0f},{abs(phi_mnt):.0f},{abs(phi_sec):.5f},{lam_deg:.0f},{abs(lam_mnt):.0f},{abs(lam_sec):.5f}, {h:.3f} \n'
+                    wynik_transformacji.write(zapis)
                     
                 args.from_file.close()
                 wynik_transformacji.close()
