@@ -37,11 +37,12 @@ W przypadku transformacji do układu 2000 dane wyjściowe zostaną zapisane jako
 przy czym każda ze współrzędnych podana w metrach i określona do części tysięcznych.
 
 
-c) W przypadku współrzędnych geocentrycznych XYZ początka odcinka i współrzędnych geocentrycznych XYZ końca odcinka jako danych wejściowych
+c) W przypadku współrzędnych geocentrycznych XYZ satelity i współrzędnych geocentrycznych XYZ anteny jako danych wejściowych
 plik tekstowy powinien zawierać w kolejnych liniach owe współrzędne zapisane w następującej kolejności:
-Xpoczątkowe, Ypoczątkowe, Zpoczątkowe, Xkońcowe, Ykońcowe, Zkońcowe  przy czym współrzędne musza być one oddzielone od siebie przecinkami,
+X satelity, Y satelity, Zp satelity, X anteny, Y anteny, Z anteny  przy czym współrzędne musza być one oddzielone od siebie przecinkami,
 a części dziesiętne oddzielone od jedności kropką. 
 Przykładowo:  1000.000, 1200.000, 1300.000, 1001.000, 1202.000, 1303.000
+Dane wyjściowe zostaną zapisane jako współrzędne topocentryczne anteny: northing, easting, up przy czym każda ze współrzędnych podana w metrach i zaokrąglona do części tysięcznych.
 
 Aby skorzystać z programu i danych zapisanych na pliku wejściowym, wywołujemy go przez wiersz poleceń. Program korzysta z biblioteki argparse, 
 zatem przy wowołaniu podajemy argumenty. Argument "-m" oznacza model elipsoidy, na której dokonujemy przeliczeń współrzędnych, przy czym program obsługuje trzy, które użytkownik ma do wyboru: "wgs84","grs80", "krassowski".
