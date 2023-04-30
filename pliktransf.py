@@ -293,7 +293,6 @@ if __name__=='__main__':
     
     if args.m == 'grs80':
         if args.t == 'Hirvonen':
-            
                 lines = args.from_file.readlines()
                 wynik_transformacji = args.to_file
                 
@@ -310,9 +309,18 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geocentryczne_grs80=Transformacje(model = "grs80")
                     phi,lam,h = geocentryczne_grs80.Hirvonen(float(x), float(y), float(z))
-                    wynik_transformacji.write(str(phi)+",")
-                    wynik_transformacji.write(str(lam)+ ",")
-                    wynik_transformacji.write(str(h)+"\n")
+                    
+
+                    phi_deg=np.trunc(phi)
+                    phi_mnt=np.trunc((phi-phi_deg)*60) 
+                    phi_sec=(((phi-phi_deg)*60)-phi_mnt)*60
+                    
+                    lam_deg=np.trunc(lam)
+                    lam_mnt=np.trunc((lam-lam_deg)*60) 
+                    lam_sec=(((lam-lam_deg)*60)-lam_mnt)*60
+                    
+                    zapis=f'{phi_deg:.0f},{abs(phi_mnt):.0f},{abs(phi_sec):.5f},{lam_deg:.0f},{abs(lam_mnt):.0f},{abs(lam_sec):.5f}, {h:.3f} \n'
+                    wynik_transformacji.write(zapis)
                     
                 args.from_file.close()
                 wynik_transformacji.close()
@@ -348,9 +356,9 @@ if __name__=='__main__':
                 #utworzy obiekt o tych współrzędnych
                 geodezyjneXYZ_grs80=Transformacje(model = "grs80")
                 X, Y, Z = geodezyjneXYZ_grs80.BLHtoXYZ(float(b), float(l), float(h))
-                wynik_transformacji.write(str(X)+",")
-                wynik_transformacji.write(str(Y)+",")
-                wynik_transformacji.write(str(Z)+"\n")
+                zapis= f'{X:.3f} , {Y:.3f}, {Z:.3f} \n'
+                wynik_transformacji.write(zapis)
+                
                 
             args.from_file.close()
             wynik_transformacji.close()
@@ -388,8 +396,8 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne2000_grs80=Transformacje(model = "grs80")
                     X2000, Y2000 = geodezyjne2000_grs80.BLHto2000(float(b), float(l), float(h))
-                    wynik_transformacji.write(str(X2000)+",")
-                    wynik_transformacji.write(str(Y2000)+"\n")
+                    zapis= f'{X2000:.3f} , {Y2000:.3f} \n'
+                    wynik_transformacji.write(zapis)
                     
                 args.from_file.close()
                 wynik_transformacji.close()
@@ -425,8 +433,8 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne1992_grs80=Transformacje(model = "grs80")
                     X1992, Y1992 = geodezyjne1992_grs80.BLHto1992(float(b), float(l), float(h))
-                    wynik_transformacji.write(str(X1992)+",")
-                    wynik_transformacji.write(str(Y1992)+"\n")
+                    zapis= f'{X1992:.3f} , {Y1992:.3f} \n'
+                    wynik_transformacji.write(zapis)
                     
                 args.from_file.close()
                 wynik_transformacji.close()
@@ -452,9 +460,9 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geocentryczne_wgs84=Transformacje(model = "wgs84")
                     phi,lam,h = geocentryczne_wgs84.Hirvonen(float(x), float(y), float(z))
-                    wynik_transformacji.write(str(phi)+",")
-                    wynik_transformacji.write(str(lam)+",")
-                    wynik_transformacji.write(str(h)+"\n")
+                    
+                    
+                    
                     
                 args.from_file.close()
                 wynik_transformacji.close()
@@ -490,9 +498,8 @@ if __name__=='__main__':
                 #utworzy obiekt o tych współrzędnych
                 geodezyjneXYZ_wgs84=Transformacje(model = "wgs84")
                 X, Y, Z = geodezyjneXYZ_wgs84.BLHtoXYZ(float(b), float(l), float(h))
-                wynik_transformacji.write(str(X)+",")
-                wynik_transformacji.write(str(Y)+",")
-                wynik_transformacji.write(str(Z)+"\n")
+                zapis= f'{X:.3f} , {Y:.3f}, {Z:.3f} \n'
+                wynik_transformacji.write(zapis)
                 
             args.from_file.close()
             wynik_transformacji.close()
@@ -528,8 +535,8 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne2000_wgs84=Transformacje(model = "wgs84")
                     X2000, Y2000 = geodezyjne2000_wgs84.BLHto2000(float(b), float(l), float(h))
-                    wynik_transformacji.write(str(X2000)+",")
-                    wynik_transformacji.write(str(Y2000)+"\n")
+                    zapis= f'{X2000:.3f} , {Y2000:.3f} \n'
+                    wynik_transformacji.write(zapis)
                     
                 args.from_file.close()
                 wynik_transformacji.close()
@@ -564,8 +571,8 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne1992_wgs84=Transformacje(model = "wgs84")
                     X1992, Y1992 = geodezyjne1992_wgs84.BLHto1992(float(b), float(l), float(h))
-                    wynik_transformacji.write(str(X1992) +",")
-                    wynik_transformacji.write(str(Y1992) +"\n")
+                    zapis= f'{X1992:.3f} , {Y1992:.3f} \n'
+                    wynik_transformacji.write(zapis)
                     
                 args.from_file.close()
                 wynik_transformacji.close()
@@ -591,9 +598,9 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geocentryczne_krassowski=Transformacje(model = "krassowski")
                     phi,lam,h = geocentryczne_krassowski.Hirvonen(float(x), float(y), float(z))
-                    wynik_transformacji.write(str(phi)+ ",")
-                    wynik_transformacji.write(str(lam)+ ",")
-                    wynik_transformacji.write(str(h)+ "\n")
+                    
+                    
+                    
                     
                 args.from_file.close()
                 wynik_transformacji.close()
@@ -629,9 +636,8 @@ if __name__=='__main__':
                 #utworzy obiekt o tych współrzędnych
                 geodezyjneXYZ_krassowski=Transformacje(model = "krassowski")
                 X, Y, Z = geodezyjneXYZ_krassowski.BLHtoXYZ(float(b), float(l), float(h))
-                wynik_transformacji.write(str(X)+",")
-                wynik_transformacji.write(str(Y)+",")
-                wynik_transformacji.write(str(Z)+"\n")
+                zapis= f'{X:.3f} , {Y:.3f}, {Z:.3f} \n'
+                wynik_transformacji.write(zapis)
                 
             args.from_file.close()
             wynik_transformacji.close()
@@ -667,8 +673,8 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne2000_krassowski=Transformacje(model = "krassowski")
                     X2000, Y2000 = geodezyjne2000_krassowski.BLHto2000(float(b), float(l), float(h))
-                    wynik_transformacji.write(str(X2000) +",")
-                    wynik_transformacji.write(str(Y2000) +"\n")
+                    zapis= f'{X2000:.3f} , {Y2000:.3f} \n'
+                    wynik_transformacji.write(zapis)
                     
                 args.from_file.close()
                 wynik_transformacji.close()
@@ -703,8 +709,8 @@ if __name__=='__main__':
                     #utworzy obiekt o tych współrzędnych
                     geodezyjne1992_krassowski=Transformacje(model = "krassowski")
                     X1992, Y1992 = geodezyjne1992_krassowski.BLHto1992(float(b), float(l), float(h))
-                    wynik_transformacji.write(str(X1992) + ",")
-                    wynik_transformacji.write(str(Y1992) + "\n")
+                    zapis= f'{X1992:.3f} , {Y1992:.3f} \n'
+                    wynik_transformacji.write(zapis)
                     
                 args.from_file.close()
                 wynik_transformacji.close()
