@@ -12,26 +12,34 @@ przeliczenie współrzędnych geodezyjnych BLH do współrzędnych geocentryczny
 Program obsługuje parametry modeli elipsoid: GRS80, WGS84, Krassowskiego
 
 2. WYMAGANIA:
-Aby program zadziałał na danym komputerze/laptopie musi on mieć zainstalowanego Pythona wersję 3.10, bibliotekę Numpy, a także zintegrowane środowisko-Spydera.
+Aby program zadziałał na danym komputerze/laptopie musi on mieć zainstalowanego Pythona wersję 3.10, bibliotekę Numpy, bibliotekę Argparse, a także zintegrowane środowisko-Spyder wersja 5.1.5.
 
 3. SYSTEM OPERACUJNY NA KOMPUTERZE A PROGRAM:
 Program został napisany dla systemu operacyjnego Windows 10
 
 4. UŻYTKOWANIE PROGRAMU:
-Aby skorzystać z programu, współrzędne wejściowe muszą być zapisane w pliku z rozszerzeniem .txt w tym samym folderze co program.
+Aby skorzystać z programu użytkownik powinien posiadać przygotowany wcześniej plik (rozszerzenie .txt) z danymi wyjściowymi zapisanymi w określony poniżej sposób:
 
-a) W przypadku współrzędnych geocentrycznych XYZ jako danych wejściowych plik tekstowy w pierwszej linii powiniem zawierać nazwę "geocentryczne". 
-W kolejnych liniach owe współrzędne należy zapisać w następującej kolejności: X, Y, Z, przy czym współrzędne musza być one oddzielone od siebie przecinkami, 
+a) W przypadku współrzędnych geocentrycznych XYZ jako danych wejściowych plik tekstowy powinien zawierać w kolejnych liniach owe 
+współrzędne, zapisane w następującej kolejności: X, Y, Z, przy czym współrzędne musza być one oddzielone od siebie przecinkami, 
 a części dziesiętne oddzielone od jedności kropką. 
 Przykładowo: 1000.000, 1200.000, 1300.000
+Dane wyjściowe zostaną zapisane jako: B(decimal), B(minutes), B(seconds), L(decimal), L(minutes), L(seconds), H (metry).
 
-b) W przypadku współrzędnych geodezyjnych jako danych wejściowych plik tekstowy w pierwszej linii powiniem zawierać nazwę "geodezyjne". W kolejnych liniach owe współrzędne 
-należy zapisać w następującej kolejności: B, L, H przy czym współrzędne musza być one oddzielone od siebie przecinkami, a części dziesiętne oddzielone od jedności kropką.
-Przykładowo: 52.00000, 21.00000, 130.000
+b) W przypadku współrzędnych geodezyjnych jako danych wejściowych plik tekstowy powiniem zawierać w kolejnych liniach owe współrzędne 
+zapisane w następującej kolejności: B(decimal), B(minutes), B(seconds), L(decimal), L(minutes), L(seconds), H przy czym współrzędne musza być one oddzielone od siebie przecinkami, a części dziesiętne oddzielone od jedności kropką.
+Przykładowo: 52,16,22.000,17,11,21.888,131.000
+W przypadku transformacji do współrzędnych geocentrycznych dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X,Y,Z, 
+przy czym każda ze współrzędnych określona do części tysięcznych. 
+W przypadku transformacji do układu 1992 dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X1992,Y1992 
+przy czym każda ze współrzędnych określona do części tysięcznych.
+W przypadku transformacji do układu 2000 dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X2000,Y2000 
+przy czym każda ze współrzędnych określona do części tysięcznych.
 
-c) W przypadku współrzędnych geocentrycznych XYZ początka odcinka i współrzędnych geocentrcznych XYZ końca odcinka jako danych wejściowych
-plik tekstowy w pierwszej linii powiniem zawierać nazwę "geocentryczne". W kolejnych liniach owe współrzędne należy zapisać w następującej kolejności:
- Xpoczątkowe, Ypoczątkowe, Zpoczątkowe, Xkońcowe, Ykońcowe, Zkońcowe  przy czym współrzędne musza być one oddzielone od siebie przecinkami,
+
+c) W przypadku współrzędnych geocentrycznych XYZ początka odcinka i współrzędnych geocentrycznych XYZ końca odcinka jako danych wejściowych
+plik tekstowy powinien zawierać w kolejnych liniach owe współrzędne zapisane w następującej kolejności:
+Xpoczątkowe, Ypoczątkowe, Zpoczątkowe, Xkońcowe, Ykońcowe, Zkońcowe  przy czym współrzędne musza być one oddzielone od siebie przecinkami,
 a części dziesiętne oddzielone od jedności kropką. 
 Przykładowo:  1000.000, 1200.000, 1300.000, 1001.000, 1202.000, 1303.000
 
