@@ -284,6 +284,9 @@ class Transformacje:
 
 if __name__=='__main__':
     
+    print('Skorzystaj z wiersza poleceń')
+    print('ustal model elipsoidy, transformację, plik z danymi wejciowmi, plik do którego dane mają zostać zapisane')
+    
     import argparse
     parser = argparse.ArgumentParser(description='Transformacje współrzędnych')
     parser.add_argument('-m', type=str, help='Model elipsoidy', choices=['wgs84', 'grs80', 'krassowski'] )
@@ -293,7 +296,7 @@ if __name__=='__main__':
     
     args = parser.parse_args()
     
-    print(args.m, args.t, args.from_file, args.to_file)
+    
     
     
     
