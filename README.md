@@ -20,13 +20,13 @@ Program został napisany dla systemu operacyjnego Windows 10
 Aby skorzystać z programu użytkownik powinien posiadać przygotowany wcześniej plik (rozszerzenie .txt) z danymi wyjściowymi zapisanymi w określony poniżej sposób:
 
 a) W przypadku współrzędnych geocentrycznych XYZ jako danych wejściowych plik tekstowy powinien zawierać w kolejnych liniach owe 
-współrzędne, zapisane w następującej kolejności: X, Y, Z, przy czym współrzędne musza być one oddzielone od siebie przecinkami, 
+współrzędne (jednostka: metr), zapisane w następującej kolejności: X, Y, Z, przy czym współrzędne musza być one oddzielone od siebie przecinkami, 
 a części dziesiętne oddzielone od jedności kropką. 
 Przykładowo dla jednego punktu: 1000.000, 1200.000, 1300.000
 Dane wyjściowe zostaną zapisane jako: B(decimal), B(minutes), B(seconds), L(decimal), L(minutes), L(seconds), H (metry).
 (Przykładowy plik z danymi wyjściowymi dla tej transformacji znajduje się na repozytorium pod nazwą wspolrzedne_geocentryczne.txt, a przykładowy plik z danymi wyjściowymi pod nazwą wynik_Hirvonen.txt)
 
-b) W przypadku współrzędnych geodezyjnych jako danych wejściowych plik tekstowy powiniem zawierać w kolejnych liniach owe współrzędne 
+b) W przypadku współrzędnych geodezyjnych jako danych wejściowych plik tekstowy powiniem zawierać w kolejnych liniach owe współrzędne (jednostka: stopnie, minuty, sekundy, dla wysokości: metr)
 zapisane w następującej kolejności: B(decimal), B(minutes), B(seconds), L(decimal), L(minutes), L(seconds), H przy czym współrzędne musza być one oddzielone od siebie przecinkami, a części dziesiętne oddzielone od jedności kropką.
 Przykładowo dla jednego punktu: 52,16,22.000,17,11,21.888,131.000
 W przypadku transformacji do współrzędnych geocentrycznych dane wyjściowe zostaną zapisane jako współrzędne geocentryczne: X,Y,Z, 
@@ -41,7 +41,7 @@ przy czym każda ze współrzędnych podana w metrach i określona do części t
 
 
 c) W przypadku współrzędnych geocentrycznych XYZ satelity i współrzędnych geocentrycznych XYZ anteny jako danych wejściowych
-plik tekstowy powinien zawierać w kolejnych liniach owe współrzędne zapisane w następującej kolejności:
+plik tekstowy powinien zawierać w kolejnych liniach owe współrzędne (jednostka: metr) zapisane w następującej kolejności:
 X satelity, Y satelity, Zp satelity, X anteny, Y anteny, Z anteny  przy czym współrzędne musza być one oddzielone od siebie przecinkami,
 a części dziesiętne oddzielone od jedności kropką. 
 Przykładowo dla jednego satelity i jednej anteny:  1000000.000, 1200000.000, 1300000.000, 1001.000, 1202.000, 1303.000
