@@ -60,6 +60,6 @@ W tym przypadku użytkownik wybrał model elipsoidy GRS80, transformację przeli
 
 
 5.	Znane błędy i nietypowe zachowania programu. 
-Podczas pisania programu nie natrafiliśmy na utrudnienia i błędy, które uniemożliwiałyby jego użytkowanie. 
+Podczas pisania programu zaimplementowaliśmy elipsoidę Krassowskiego i transformacje do układu 1992 i 2000 dla niej, ale nie działają one poprawnie, zatem nie powinny być używane.
 
 
